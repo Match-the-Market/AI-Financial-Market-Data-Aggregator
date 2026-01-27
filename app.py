@@ -2,6 +2,7 @@
 
 from flask import Flask, request, jsonify, render_template # import Flask which is the web framework
 from flask_cors import CORS
+from google import genai
 from dotenv import load_dotenv # import load_dotenv to load environment variables
 import os # import os to access environment variables
 import requests # import requests to make HTTP requests to NewsAPI
@@ -9,7 +10,6 @@ import requests # import requests to make HTTP requests to NewsAPI
 import pandas as pd # import pandas for data manipulation
 import time
 import mplfinance as mpf # import mplfinance for financial charting
-import google.generativeai as genai
 import json
 
 load_dotenv() # load api keys from .env file for security
