@@ -1,4 +1,4 @@
-# What it Is
+# What This Web App Is
 
 Web UI that aggragates recent news headlines about a innfluencieal politician and summarizes how it effects invester sentiment. Giving investors an idea of wether markets will go down up or consolidate, providing investor with opprtunities they wouldnt otherwise be aware of.
 
