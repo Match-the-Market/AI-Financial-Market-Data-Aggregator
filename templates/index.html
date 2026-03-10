@@ -3,191 +3,404 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrumpPulse AI - Tech Sector Analysis</title>
+    <title>MarketPulse AI — Political &amp; Financial Influence Tracker</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #050505;
-        }
-        .container {
-            background: rgb(0, 0, 0);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #fffafa;
-            text-align: center;
-        }
-        .loading {
-            text-align: center;
-            color: #fffefe;
-        }
-        .results {
-            margin-top: 20px;
-            color: #fffefe;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #080c14;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 16px 64px;
         }
-        .section {
-            margin: 20px 0;
-            padding: 15px;
-            border-left: 4px solid #00F0FF;
-            background-color: #000000; 
-            /* changed from white to dark for better contrast */
+
+        /* ── Header ── */
+        header {
+            text-align: center;
+            margin-bottom: 36px;
         }
-        .stock-list {
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00f0ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        header p {
+            color: #94a3b8;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* ── Search card ── */
+        .search-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 28px 32px;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 32px;
+        }
+        .search-card label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 6px;
+        }
+        .search-card input,
+        .search-card select {
+            width: 100%;
+            padding: 11px 14px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.97rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-card input:focus,
+        .search-card select:focus {
+            border-color: #00f0ff;
+        }
+        .search-card select option { background: #1e293b; }
+        .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
+
+        .suggestions {
+            margin-top: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .suggestion-chip {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 99px;
+            padding: 4px 12px;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .suggestion-chip:hover {
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(90deg, #0891b2, #7c3aed);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .analyze-btn:hover { opacity: 0.88; }
+        .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Results area ── */
+        #results-area {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .status-bar {
+            text-align: center;
+            padding: 16px;
+            color: #94a3b8;
+            font-size: 0.92rem;
+            display: none;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border: 2px solid #334155;
+            border-top-color: #00f0ff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .result-header {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+        }
+        .result-header .subject {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+        .result-header .sector-tag {
+            display: inline-block;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 99px;
+            padding: 3px 12px;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-left: 10px;
+            vertical-align: middle;
+            text-transform: capitalize;
+        }
+
+        .card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            border-left: 4px solid #00f0ff;
+        }
+        .card h3 {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 8px;
+        }
+        .card .value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .card p { font-size: 0.92rem; color: #94a3b8; line-height: 1.6; }
+
+        .up    { color: #22c55e; }
+        .down  { color: #ef4444; }
+        .consolidate { color: #f97316; }
+        .bullish { color: #22c55e; }
+        .bearish { color: #ef4444; }
+        .neutral { color: #f97316; }
+
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 10px;
-            margin: 10px 0;
+            margin-top: 4px;
         }
         .stock-item {
-            padding: 10px;
-            background: rgb(0, 0, 0);
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 14px;
             text-align: center;
         }
-        .up { color: green; font-weight: bold; }
-        .down { color: red; font-weight: bold; }
-        .consolidate { color: orange; font-weight: bold; }
-        .bearish {color: red; font-weight: bold; }
-        .bullish {color: green; font-weight:bold: }
-        .error {
-            color: red;
-            background: #ffe6e6;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        #audioPlayer {
-            width: 100%;
-            margin-top: 20px;
+        .stock-item .ticker { font-size: 1rem; font-weight: 700; color: #e2e8f0; }
+        .stock-item .movement { font-size: 0.85rem; font-weight: 600; margin-top: 4px; }
+
+        .error-box {
+            background: #1a0a0a;
+            border: 1px solid #7f1d1d;
+            border-radius: 10px;
+            padding: 16px 20px;
+            color: #fca5a5;
+            font-size: 0.92rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1> What Did Trump Do - Tech Sector Analysis</h1>
-        <p>Tracking Trump's impact on technology stocks</p>
-        
-        <div id="loading" class="loading">
-            <p> Fetching latest news and AI analysis...</p>
+
+<header>
+    <h1>📊 MarketPulse AI</h1>
+    <p>Analyze how any political or financial figure's actions impact market sectors</p>
+</header>
+
+<div class="search-card">
+    <div class="form-row">
+        <div>
+            <label for="personInput">Person to analyze</label>
+            <input
+                type="text"
+                id="personInput"
+                placeholder="e.g. Donald Trump"
+                autocomplete="off"
+            />
+            <div class="suggestions" id="suggestions">
+                <span class="suggestion-chip" data-name="Donald Trump">Donald Trump</span>
+                <span class="suggestion-chip" data-name="Jerome Powell">Jerome Powell</span>
+                <span class="suggestion-chip" data-name="Elon Musk">Elon Musk</span>
+                <span class="suggestion-chip" data-name="Janet Yellen">Janet Yellen</span>
+                <span class="suggestion-chip" data-name="Xi Jinping">Xi Jinping</span>
+                <span class="suggestion-chip" data-name="Warren Buffett">Warren Buffett</span>
+            </div>
         </div>
-        
-        <div id="results" class="results" style="display: none;">
-            <!-- Results will be populated here -->
+        <div>
+            <label for="sectorSelect">Market sector</label>
+            <select id="sectorSelect">
+                <option value="technology">Technology</option>
+                <option value="finance">Finance</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="energy">Energy</option>
+                <option value="consumer">Consumer</option>
+                <option value="industrials">Industrials</option>
+                <option value="real estate">Real Estate</option>
+                <option value="utilities">Utilities</option>
+                <option value="materials">Materials</option>
+            </select>
         </div>
-        
-        <div id="error" class="error" style="display: none;">
-            <!-- Errors will be shown here -->
-        </div>
-        
-        <audio id="audioPlayer" controls style="display: none;">
-            Your browser does not support the audio element.
-        </audio>
     </div>
-<img src="https://pngimg.com/uploads/donald_trump/donald_trump_PNG54.png" alt="Trump" style="float:right; margin-right:20px;" width="300" height="400">
-    <script>
-        // Load analysis immediately when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadTechAnalysis();
+    <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">
+        Analyze Market Impact
+    </button>
+</div>
+
+<div id="results-area">
+    <div class="status-bar" id="statusBar">
+        <span class="spinner"></span> Fetching latest news and generating AI analysis…
+    </div>
+    <div id="resultsContainer"></div>
+</div>
+
+<script>
+    // Suggestion chips
+    document.querySelectorAll('.suggestion-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.getElementById('personInput').value = chip.dataset.name;
         });
+    });
 
-        async function loadTechAnalysis() {
-            try {
-                const response = await fetch('/analyze', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ sector: 'technology' }) // Still send sector for consistency
-                });
+    // Enter key triggers analysis
+    document.getElementById('personInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') runAnalysis();
+    });
 
-                const data = await response.json();
+    async function runAnalysis() {
+        const person = document.getElementById('personInput').value.trim();
+        const sector = document.getElementById('sectorSelect').value;
+        const btn = document.getElementById('analyzeBtn');
+        const statusBar = document.getElementById('statusBar');
+        const container = document.getElementById('resultsContainer');
 
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to fetch analysis');
-                }
-
-                // Hide loading, show results
-                document.getElementById('loading').style.display = 'none';
-                displayResults(data);
-                
-                // Generate audio (you can add Eleven Labs here later)
-                // await generateAudio(data.newsSummary);
-                
-            } catch (error) {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').innerHTML = `Error: ${error.message}`;
-                console.error('Error:', error);
-            }
+        if (!person) {
+            container.innerHTML = "<div class=\"error-box\">⚠️ Please enter a person's name to analyze.</div>";
+            return;
         }
 
-        function displayResults(data) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.style.display = 'block';
-            
-            // Create movement class helper
-            function getMovementClass(movement) {
-                if (movement.toLowerCase().includes('up')) return 'up';
-                if (movement.toLowerCase().includes('down')) return 'down';
-                if (movement.toLowerCase().includes('consolidat')) return 'consolidate';
-                return '';
+        btn.disabled = true;
+        statusBar.style.display = 'block';
+        container.innerHTML = '';
+
+        try {
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ person, sector })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Analysis failed. Please try again.');
             }
 
-            resultsDiv.innerHTML = `
-                <div class="section">
-                    <h2> Overall Sentiment: <span class="${getMovementClass(data.sentiment)}">${data.sentiment}</span></h2>
-                    <p>${data.whySentiment}</p>
-                </div>
-
-                <div class="section">
-                    <h3> Short-Term Outlook: <span class="${getMovementClass(data.shortTermOutlook)}">${data.shortTermOutlook}</span></h3>
-                    <p>${data.whyShortTermOutlook}</p>
-                </div>
-
-                <div class="section">
-                    <h3> Long-Term Outlook: <span class="${getMovementClass(data.longTermOutlook)}">${data.longTermOutlook}</span></h3>
-                    <p>${data.whyLongTermOutlook}</p>
-                </div>
-
-                <div class="section">
-                    <h3> Stocks to Watch</h3>
-                    <div class="stock-list">
-                        ${data.stocksAffected.map(stock => `
-                            <div class="stock-item">
-                                <strong>${stock.ticker}</strong><br>
-                                <span class="${getMovementClass(stock.movement)}">${stock.movement}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3> AI News Summary</h3>
-                    <p>${data.newsSummary}</p>
-                </div>
-            `;
+            renderResults(data);
+        } catch (err) {
+            container.innerHTML = `<div class="error-box">⚠️ ${err.message}</div>`;
+        } finally {
+            btn.disabled = false;
+            statusBar.style.display = 'none';
         }
+    }
 
-        // Placeholder for Eleven Labs integration
-        async function generateAudio(text) {
-            // You'll implement Eleven Labs here
-            console.log('Would generate audio for:', text.substring(0, 100) + '...');
-            // const response = await fetch('/generate-audio', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ text: text })
-            // });
-            // const audioBlob = await response.blob();
-            // const audioUrl = URL.createObjectURL(audioBlob);
-            // document.getElementById('audioPlayer').src = audioUrl;
-            // document.getElementById('audioPlayer').style.display = 'block';
-        }
-    </script>
+    function movementClass(val) {
+        if (!val) return '';
+        const v = val.toLowerCase();
+        if (v.includes('up') || v.includes('bullish')) return v.includes('bullish') ? 'bullish' : 'up';
+        if (v.includes('down') || v.includes('bearish')) return v.includes('bearish') ? 'bearish' : 'down';
+        if (v.includes('consolidat') || v.includes('neutral')) return v.includes('neutral') ? 'neutral' : 'consolidate';
+        return '';
+    }
+
+    function sentimentClass(val) {
+        if (!val) return '';
+        const v = val.toLowerCase();
+        if (v.includes('bullish')) return 'bullish';
+        if (v.includes('bearish')) return 'bearish';
+        if (v.includes('neutral')) return 'neutral';
+        return '';
+    }
+
+    function renderResults(data) {
+        const container = document.getElementById('resultsContainer');
+        const stocks = Array.isArray(data.stocksAffected) ? data.stocksAffected : [];
+
+        container.innerHTML = `
+            <div class="result-header">
+                <span class="subject">${escHtml(data.person)}</span>
+                <span class="sector-tag">${escHtml(data.sector)} sector</span>
+            </div>
+
+            <div class="card">
+                <h3>Investor Sentiment</h3>
+                <div class="value ${sentimentClass(data.sentiment)}">${escHtml(data.sentiment)}</div>
+                <p>${escHtml(data.whySentiment)}</p>
+            </div>
+
+            <div class="card">
+                <h3>Short-Term Outlook</h3>
+                <div class="value ${movementClass(data.shortTermOutlook)}">${escHtml(data.shortTermOutlook)}</div>
+                <p>${escHtml(data.whyShortTermOutlook)}</p>
+            </div>
+
+            <div class="card">
+                <h3>Long-Term Outlook</h3>
+                <div class="value ${movementClass(data.longTermOutlook)}">${escHtml(data.longTermOutlook)}</div>
+                <p>${escHtml(data.whyLongTermOutlook)}</p>
+            </div>
+
+            <div class="card">
+                <h3>Stocks to Watch</h3>
+                <div class="stock-grid">
+                    ${stocks.map(s => `
+                        <div class="stock-item">
+                            <div class="ticker">${escHtml(s.ticker)}</div>
+                            <div class="movement ${movementClass(s.movement)}">${escHtml(s.movement)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>AI News Summary</h3>
+                <p>${escHtml(data.newsSummary)}</p>
+            </div>
+        `;
+    }
+
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+</script>
 </body>
 </html>
