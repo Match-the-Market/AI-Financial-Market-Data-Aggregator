@@ -14,8 +14,7 @@ import json
 
 load_dotenv() # load api keys from .env file for security
 
-genai.configure(api_key=os.getenv("GENAI_API_KEY")) # what this does it set the API key for gemini so that we can make requests to the API
-model = genai.GenerativeModel('gemini-2.5-flash') # specify the model version to use
+client = genai.Client(api_key=os.getenv("GENAI_API_KEY")) # initialize the Gemini client with the API key
 
 # valid market sectors users can choose from
 VALID_SECTORS = {
@@ -60,7 +59,7 @@ def get_gemini_analysis(news_articles, person, sector): # takes in news articles
     try:
         print("=== SENDING PROMPT TO GEMINI ===")
         
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
         gemini_raw_text = response.text # get the raw text response from gemini
         
         print("=== RAW GEMINI RESPONSE ===")
