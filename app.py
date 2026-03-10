@@ -26,6 +26,7 @@ VALID_SECTORS = {
 
 
 def get_gemini_analysis(news_articles, person, sector): # takes in news articles, person, and sector as input
+    # Prompt engineering who?
     prompt = f"""
         Analyze the following news articles about {person}'s recent actions and their impact on the
         {sector} sector: Based on this, provide:
